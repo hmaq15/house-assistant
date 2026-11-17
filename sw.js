@@ -7,7 +7,7 @@ const FILES_TO_CACHE = [
   './styles.css',
   './app.js',
   './manifest.webmanifest',
-  './icons/house.svg',
+  
   './icons/house-192.png',
   './icons/house-512.png'
 ];
