@@ -1,1 +1,84 @@
-const pages=['home','memory','devices','vision','settings'];function page(p){pages.forEach(x=>document.getElementById(x).classList.toggle('active',x===p));document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('selected',b.dataset.page===p));window.scrollTo(0,0)}document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>page(b.dataset.page));document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>page(b.dataset.open));const toast=document.getElementById('toast');function notify(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2100)}const q=document.getElementById('quietSwitch'),qb=document.getElementById('quiet');function quiet(v){q.checked=v;localStorage.setItem('houseQuiet',v?'1':'0');notify(v?'Quiet mode enabled':'Quiet mode disabled')}q.checked=localStorage.getItem('houseQuiet')==='1';qb.onclick=()=>quiet(!q.checked);q.onchange=()=>quiet(q.checked);function send(){let input=document.getElementById('prompt'),v=input.value.trim();if(!v)return;let a=document.createElement('div');a.className='bubble user';a.textContent=v;let b=document.createElement('div');b.className='bubble house';b.textContent='I’m the HOUSE interface prototype. The AI brain is not connected yet, so I cannot carry out that request. We will connect the agent in a later build.';document.getElementById('chat').append(a,b);input.value=''}document.getElementById('send').onclick=send;document.getElementById('prompt').onkeydown=e=>{if(e.key==='Enter')send()};if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+const pages = ['home', 'memory', 'devices', 'vision', 'settings'];
+
+function page(p) {
+  pages.forEach(x => {
+    document.getElementById(x).classList.toggle('active', x === p);
+  });
+
+  document.querySelectorAll('[data-page]').forEach(b => {
+    b.classList.toggle('selected', b.dataset.page === p);
+  });
+
+  window.scrollTo(0, 0);
+}
+
+document.querySelectorAll('[data-page]').forEach(b => {
+  b.onclick = () => page(b.dataset.page);
+});
+
+document.querySelectorAll('[data-open]').forEach(b => {
+  b.onclick = () => page(b.dataset.open);
+});
+
+const toast = document.getElementById('toast');
+
+function notify(t) {
+  toast.textContent = t;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2100);
+}
+
+const q = document.getElementById('quietSwitch');
+const qb = document.getElementById('quiet');
+
+function quiet(v) {
+  q.checked = v;
+  localStorage.setItem('houseQuiet', v ? '1' : '0');
+  notify(v ? 'Quiet mode enabled' : 'Quiet mode disabled');
+}
+
+q.checked = localStorage.getItem('houseQuiet') === '1';
+qb.onclick = () => quiet(!q.checked);
+q.onchange = () => quiet(q.checked);
+
+function send() {
+  let input = document.getElementById('prompt');
+  let v = input.value.trim();
+  if (!v) return;
+
+  let a = document.createElement('div');
+  a.className = 'bubble user';
+  a.textContent = v;
+
+  let b = document.createElement('div');
+  b.className = 'bubble house';
+  b.textContent = 'I’m the HOUSE interface prototype. The AI brain is not connected yet, so I cannot carry out that request. We will connect the agent in a later build.';
+
+  document.getElementById('chat').append(a, b);
+  input.value = '';
+}
+
+document.getElementById('send').onclick = send;
+
+document.getElementById('prompt').onkeydown = e => {
+  if (e.key === 'Enter') send();
+};
+
+// HOUSE service worker registration
+if ('serviceWorker' in navigator) {
+  const registerHouseWorker = () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => notify('HOUSE offline support enabled'))
+      .catch(error => {
+        console.error('HOUSE service worker error:', error);
+        notify('Service worker error: ' + error.message);
+      });
+  };
+
+  if (document.readyState === 'complete') {
+    registerHouseWorker();
+  } else {
+    window.addEventListener('load', registerHouseWorker, { once: true });
+  }
+}
